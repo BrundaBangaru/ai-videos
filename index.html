@@ -1,0 +1,1926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASTRA Studio — Free AI Creation Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050508;
+    --surface: #0d0d14;
+    --card: #111118;
+    --border: #1e1e2e;
+    --accent: #7c3aed;
+    --accent2: #06b6d4;
+    --accent3: #f59e0b;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --success: #10b981;
+    --danger: #ef4444;
+    --glow: rgba(124,58,237,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated BG */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(124,58,237,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(6,182,212,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse 40% 30% at 50% 50%, rgba(245,158,11,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(5,5,8,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+  }
+
+  .header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .logo-icon {
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    box-shadow: 0 0 20px var(--glow);
+  }
+
+  .logo span { color: var(--accent2); }
+
+  .hf-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(245,158,11,0.1);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent3);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .hf-dot {
+    width: 6px; height: 6px;
+    background: var(--accent3);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* TOKEN BAR */
+  .token-bar {
+    background: rgba(124,58,237,0.08);
+    border-bottom: 1px solid rgba(124,58,237,0.15);
+    padding: 8px 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    font-size: 0.78rem;
+    font-family: 'Space Mono', monospace;
+    color: var(--muted);
+  }
+
+  .token-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .token-input-wrap input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    width: 220px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .token-input-wrap input:focus { border-color: var(--accent); }
+
+  .token-status {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .token-status.connected { background: rgba(16,185,129,0.15); color: var(--success); }
+  .token-status.disconnected { background: rgba(239,68,68,0.15); color: var(--danger); }
+
+  /* TABS */
+  .tabs-nav {
+    display: flex;
+    gap: 2px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tabs-nav::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 20px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+  }
+
+  .tab-btn:hover { color: var(--text); }
+
+  .tab-btn.active {
+    color: var(--text);
+    border-bottom-color: var(--accent);
+    background: rgba(124,58,237,0.06);
+  }
+
+  .tab-icon { font-size: 1.1rem; }
+
+  /* MAIN LAYOUT */
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* SECTION HEADER */
+  .section-header {
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+
+  .section-title span { 
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .section-desc {
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: rgba(124,58,237,0.3); }
+
+  .card-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 10px;
+  }
+
+  /* TWO COL */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* FORM ELEMENTS */
+  label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  textarea, select, input[type="text"], input[type="number"], input[type="range"] {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    resize: none;
+  }
+
+  textarea:focus, select:focus, input[type="text"]:focus, input[type="number"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+  }
+
+  select { cursor: pointer; }
+
+  select option { background: var(--card); }
+
+  .form-row { margin-bottom: 1rem; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+  /* RANGE SLIDER */
+  .range-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  input[type="range"] {
+    padding: 0;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--border);
+    border-radius: 2px;
+    border: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--glow);
+  }
+
+  .range-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent2);
+    min-width: 30px;
+    text-align: right;
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 22px;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #6d28d9);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 28px rgba(124,58,237,0.45);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent2); }
+
+  .btn-sm { padding: 7px 14px; font-size: 0.8rem; }
+
+  .btn-full { width: 100%; }
+
+  /* MODEL SELECTOR */
+  .model-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .model-tag {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: 'Space Mono', monospace;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    color: var(--muted);
+  }
+
+  .model-tag:hover { border-color: var(--accent); color: var(--text); }
+  .model-tag.active { background: rgba(124,58,237,0.15); border-color: var(--accent); color: var(--accent2); }
+
+  /* OUTPUT AREA */
+  .output-area {
+    min-height: 300px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .output-placeholder {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .output-placeholder .output-icon { font-size: 2.5rem; margin-bottom: 8px; opacity: 0.4; }
+
+  .output-area img, .output-area video {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    display: block;
+  }
+
+  .output-area audio {
+    width: 100%;
+    margin: 1rem;
+  }
+
+  /* PROGRESS */
+  .progress-wrap {
+    width: 100%;
+    padding: 0 1.5rem;
+    text-align: center;
+  }
+
+  .progress-bar-outer {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 10px 0;
+  }
+
+  .progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    animation: progress-anim 2s ease infinite;
+  }
+
+  @keyframes progress-anim {
+    0% { width: 10%; }
+    50% { width: 80%; }
+    100% { width: 95%; }
+  }
+
+  .progress-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  /* STATUS LOG */
+  .status-log {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    max-height: 120px;
+    overflow-y: auto;
+    line-height: 1.8;
+  }
+
+  .log-entry { display: flex; gap: 8px; }
+  .log-entry .log-time { color: var(--accent3); flex-shrink: 0; }
+  .log-entry.log-success .log-msg { color: var(--success); }
+  .log-entry.log-error .log-msg { color: var(--danger); }
+  .log-entry.log-info .log-msg { color: var(--accent2); }
+
+  /* IMAGE UPLOAD */
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(124,58,237,0.05);
+  }
+
+  .drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .drop-icon { font-size: 2rem; margin-bottom: 8px; }
+
+  .drop-text {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .preview-img {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+
+  /* GALLERY */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .gallery-item {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+
+  .gallery-item .item-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .gallery-item:hover .item-overlay { opacity: 1; }
+
+  /* TTS VOICE */
+  .voice-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .voice-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .voice-card:hover { border-color: var(--accent2); }
+  .voice-card.active { border-color: var(--accent2); background: rgba(6,182,212,0.08); }
+  .voice-card .voice-name { font-size: 0.8rem; font-weight: 600; }
+  .voice-card .voice-lang { font-size: 0.7rem; color: var(--muted); font-family: 'Space Mono', monospace; }
+  .voice-card .voice-icon { font-size: 1.3rem; margin-bottom: 4px; }
+
+  /* QUEUE INDICATOR */
+  .queue-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  .queue-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); animation: pulse 2s infinite; }
+
+  /* DOWNLOAD BTN */
+  .download-bar {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    justify-content: flex-end;
+  }
+
+  /* TOOLTIP */
+  .tip {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  .tip a { color: var(--accent2); text-decoration: none; }
+
+  /* INFO BOX */
+  .info-box {
+    background: rgba(6,182,212,0.07);
+    border: 1px solid rgba(6,182,212,0.2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent2);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .warn-box {
+    background: rgba(245,158,11,0.07);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent3);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  /* GUIDE */
+  .guide-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.2rem;
+    margin-top: 1rem;
+  }
+
+  .guide-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.2rem;
+  }
+
+  .guide-step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #fff;
+  }
+
+  .guide-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+
+  .guide-body {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.7;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .guide-body a { color: var(--accent2); text-decoration: none; }
+  .guide-body a:hover { text-decoration: underline; }
+
+  .guide-body code {
+    background: var(--surface);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    color: var(--accent3);
+  }
+
+  /* SPINNER */
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* PROMPT PRESETS */
+  .presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+  }
+
+  .preset-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 4px 10px;
+    font-size: 0.72rem;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.15s;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .preset-chip:hover { color: var(--text); border-color: var(--accent); }
+
+  /* CHAR COUNTER */
+  .char-counter {
+    font-size: 0.7rem;
+    font-family: 'Space Mono', monospace;
+    color: var(--muted);
+    text-align: right;
+    margin-top: 4px;
+  }
+
+  /* COPY BTN */
+  .copy-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-family: 'Space Mono', monospace;
+    transition: color 0.15s;
+    padding: 2px 6px;
+  }
+
+  .copy-btn:hover { color: var(--accent2); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <div class="logo-icon">✦</div>
+      ASTRA <span>Studio</span>
+    </a>
+    <div class="hf-badge">
+      <div class="hf-dot"></div>
+      🤗 Hugging Face · 100% Free
+    </div>
+  </div>
+</header>
+
+<!-- TOKEN BAR -->
+<div class="token-bar">
+  <span>HF Token (optional, for faster access):</span>
+  <div class="token-input-wrap">
+    <input type="text" id="hfToken" placeholder="hf_xxxxxxxxxxxxxxxxxxxx" oninput="updateTokenStatus()">
+    <span id="tokenStatus" class="token-status disconnected">NO TOKEN</span>
+  </div>
+  <a href="https://huggingface.co/settings/tokens" target="_blank" style="color:var(--accent2);font-size:0.72rem;text-decoration:none;">Get free token →</a>
+</div>
+
+<!-- TABS -->
+<div class="tabs-nav">
+  <button class="tab-btn active" onclick="switchTab('video', this)"><span class="tab-icon">🎬</span> Text → Video</button>
+  <button class="tab-btn" onclick="switchTab('image', this)"><span class="tab-icon">🖼️</span> Text → Image</button>
+  <button class="tab-btn" onclick="switchTab('img2img', this)"><span class="tab-icon">🎨</span> Image → Image</button>
+  <button class="tab-btn" onclick="switchTab('tts', this)"><span class="tab-icon">🎙️</span> Text → Speech</button>
+  <button class="tab-btn" onclick="switchTab('gallery', this)"><span class="tab-icon">📁</span> Gallery</button>
+  <button class="tab-btn" onclick="switchTab('guide', this)"><span class="tab-icon">🚀</span> Deploy Guide</button>
+</div>
+
+<main>
+
+<!-- ======== TAB: TEXT TO VIDEO ======== -->
+<div id="tab-video" class="tab-panel active">
+  <div class="section-header">
+    <div class="section-title">Text → <span>Video</span></div>
+    <div class="section-desc">// generate short videos from text prompts · powered by HF Inference API</div>
+  </div>
+
+  <div class="warn-box">
+    ⚠ Video generation is computationally heavy. Free tier may have queue waits of 1–5 min. With an HF token, you get higher rate limits. Models return short clips (2–4s).
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="card">
+        <div class="card-label">Model Selection</div>
+        <div class="model-tags" id="videoModels">
+          <button class="model-tag active" data-model="Wan-AI/Wan2.1-T2V-14B" onclick="selectModel('video', this)">Wan2.1-T2V-14B</button>
+          <button class="model-tag" data-model="ali-vilab/text-to-video-ms-1.7b" onclick="selectModel('video', this)">ModelScope T2V</button>
+          <button class="model-tag" data-model="damo-vilab/text-to-video-ms-1.7b" onclick="selectModel('video', this)">DAMO ViLab</button>
+        </div>
+
+        <div class="form-row">
+          <label>Prompt</label>
+          <textarea id="videoPrompt" rows="4" placeholder="A cinematic shot of a golden sunset over the ocean, waves crashing gently, 4K quality, photorealistic..." oninput="countChars(this, 'videoCharCount')"></textarea>
+          <div class="char-counter"><span id="videoCharCount">0</span> / 500</div>
+          <div class="presets" id="videoPresets">
+            <span class="preset-chip" onclick="setPrompt('videoPrompt', 'A majestic eagle soaring over snow-capped mountains, cinematic, 4K')">🦅 Eagle flight</span>
+            <span class="preset-chip" onclick="setPrompt('videoPrompt', 'Time-lapse of blooming flowers in a meadow, macro photography, golden hour')">🌸 Blooming flowers</span>
+            <span class="preset-chip" onclick="setPrompt('videoPrompt', 'Cyberpunk city at night, neon lights, rain-soaked streets, flying cars')">🌃 Cyberpunk city</span>
+            <span class="preset-chip" onclick="setPrompt('videoPrompt', 'Ocean waves crashing on rocks at sunset, slow motion, dramatic lighting')">🌊 Ocean waves</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Negative Prompt (optional)</label>
+          <textarea id="videoNegPrompt" rows="2" placeholder="blurry, low quality, distorted, artifacts..."></textarea>
+        </div>
+
+        <div class="form-grid">
+          <div>
+            <label>Steps</label>
+            <div class="range-wrap">
+              <input type="range" id="videoSteps" min="10" max="50" value="25" oninput="document.getElementById('videoStepsVal').textContent=this.value">
+              <span class="range-val" id="videoStepsVal">25</span>
+            </div>
+          </div>
+          <div>
+            <label>Guidance Scale</label>
+            <div class="range-wrap">
+              <input type="range" id="videoGuidance" min="1" max="15" step="0.5" value="7.5" oninput="document.getElementById('videoGuidanceVal').textContent=this.value">
+              <span class="range-val" id="videoGuidanceVal">7.5</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-full" id="videoGenBtn" onclick="generateVideo()" style="margin-top:1rem">
+          ✦ Generate Video
+        </button>
+
+        <div class="queue-info" id="videoQueue" style="display:none">
+          <div class="queue-dot"></div>
+          <span id="videoQueueText">Queued on Hugging Face servers…</span>
+        </div>
+      </div>
+
+      <div class="status-log" id="videoLog" style="margin-top:1rem">
+        <div class="log-entry log-info"><span class="log-time">[ASTRA]</span><span class="log-msg">Ready. Enter a prompt and click Generate.</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card-label">Output</div>
+      <div class="output-area" id="videoOutput">
+        <div class="output-placeholder">
+          <div class="output-icon">🎬</div>
+          <div>Video will appear here</div>
+          <div style="font-size:0.7rem;margin-top:4px">Typical wait: 1–5 minutes on free tier</div>
+        </div>
+      </div>
+      <div class="download-bar" id="videoDownloadBar" style="display:none">
+        <button class="btn btn-secondary btn-sm" onclick="downloadOutput('videoOutputEl', 'video.mp4')">⬇ Download MP4</button>
+        <button class="btn btn-secondary btn-sm" onclick="saveToGallery('video')">📁 Save to Gallery</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== TAB: TEXT TO IMAGE ======== -->
+<div id="tab-image" class="tab-panel">
+  <div class="section-header">
+    <div class="section-title">Text → <span>Image</span></div>
+    <div class="section-desc">// generate images from text · stable diffusion & flux models</div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="card">
+        <div class="card-label">Model</div>
+        <div class="model-tags" id="imageModels">
+          <button class="model-tag active" data-model="black-forest-labs/FLUX.1-schnell" onclick="selectModel('image', this)">FLUX.1 Schnell ⚡</button>
+          <button class="model-tag" data-model="stabilityai/stable-diffusion-xl-base-1.0" onclick="selectModel('image', this)">SDXL Base</button>
+          <button class="model-tag" data-model="runwayml/stable-diffusion-v1-5" onclick="selectModel('image', this)">SD 1.5</button>
+          <button class="model-tag" data-model="stabilityai/stable-diffusion-2-1" onclick="selectModel('image', this)">SD 2.1</button>
+          <button class="model-tag" data-model="prompthero/openjourney" onclick="selectModel('image', this)">OpenJourney</button>
+        </div>
+
+        <div class="form-row">
+          <label>Prompt</label>
+          <textarea id="imagePrompt" rows="4" placeholder="A stunning portrait of a warrior queen, dramatic lighting, fantasy art, ultra detailed, 8K..." oninput="countChars(this,'imageCharCount')"></textarea>
+          <div class="char-counter"><span id="imageCharCount">0</span> / 500</div>
+          <div class="presets">
+            <span class="preset-chip" onclick="setPrompt('imagePrompt', 'A stunning portrait of a warrior queen, dramatic lighting, fantasy art, ultra detailed')">👸 Warrior queen</span>
+            <span class="preset-chip" onclick="setPrompt('imagePrompt', 'Futuristic cityscape at dusk, cyberpunk aesthetic, neon lights, hyperdetailed')">🌆 Futuristic city</span>
+            <span class="preset-chip" onclick="setPrompt('imagePrompt', 'A serene Japanese garden with cherry blossoms, soft watercolor style, tranquil')">🌸 Japanese garden</span>
+            <span class="preset-chip" onclick="setPrompt('imagePrompt', 'Deep ocean abyss with glowing bioluminescent creatures, cinematic, 4K')">🌊 Deep ocean</span>
+            <span class="preset-chip" onclick="setPrompt('imagePrompt', 'Portrait of an astronaut in a field of wildflowers, photorealistic, golden hour')">🧑‍🚀 Astronaut field</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Negative Prompt</label>
+          <textarea id="imageNegPrompt" rows="2" placeholder="blurry, low quality, ugly, distorted, watermark, text..."></textarea>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-row">
+            <label>Width</label>
+            <select id="imageWidth">
+              <option value="512">512px</option>
+              <option value="768">768px</option>
+              <option value="1024" selected>1024px</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Height</label>
+            <select id="imageHeight">
+              <option value="512">512px</option>
+              <option value="768">768px</option>
+              <option value="1024" selected>1024px</option>
+            </select>
+          </div>
+          <div>
+            <label>Steps</label>
+            <div class="range-wrap">
+              <input type="range" id="imageSteps" min="10" max="50" value="20" oninput="document.getElementById('imageStepsVal').textContent=this.value">
+              <span class="range-val" id="imageStepsVal">20</span>
+            </div>
+          </div>
+          <div>
+            <label>Guidance</label>
+            <div class="range-wrap">
+              <input type="range" id="imageGuidance" min="1" max="20" step="0.5" value="7" oninput="document.getElementById('imageGuidanceVal').textContent=this.value">
+              <span class="range-val" id="imageGuidanceVal">7</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Seed (−1 = random)</label>
+          <input type="number" id="imageSeed" value="-1" min="-1">
+        </div>
+
+        <button class="btn btn-primary btn-full" id="imageGenBtn" onclick="generateImage()">
+          ✦ Generate Image
+        </button>
+      </div>
+
+      <div class="status-log" id="imageLog" style="margin-top:1rem">
+        <div class="log-entry log-info"><span class="log-time">[ASTRA]</span><span class="log-msg">Ready. Select model and enter prompt.</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card-label">Output</div>
+      <div class="output-area" id="imageOutput">
+        <div class="output-placeholder">
+          <div class="output-icon">🖼️</div>
+          <div>Image will appear here</div>
+        </div>
+      </div>
+      <div class="download-bar" id="imageDownloadBar" style="display:none">
+        <button class="btn btn-secondary btn-sm" onclick="downloadOutput('imageOutputEl', 'image.png')">⬇ Download PNG</button>
+        <button class="btn btn-secondary btn-sm" onclick="saveToGallery('image')">📁 Save to Gallery</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== TAB: IMAGE TO IMAGE ======== -->
+<div id="tab-img2img" class="tab-panel">
+  <div class="section-header">
+    <div class="section-title">Image → <span>Image</span></div>
+    <div class="section-desc">// transform uploaded images with AI · style transfer · inpainting</div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="card">
+        <div class="card-label">Model</div>
+        <div class="model-tags" id="img2imgModels">
+          <button class="model-tag active" data-model="stabilityai/stable-diffusion-xl-refiner-1.0" onclick="selectModel('img2img', this)">SDXL Refiner</button>
+          <button class="model-tag" data-model="runwayml/stable-diffusion-v1-5" onclick="selectModel('img2img', this)">SD 1.5 Img2Img</button>
+          <button class="model-tag" data-model="timbrooks/instruct-pix2pix" onclick="selectModel('img2img', this)">InstructPix2Pix</button>
+        </div>
+
+        <div class="form-row">
+          <label>Upload Image</label>
+          <div class="drop-zone" id="img2imgDrop" ondragover="handleDragOver(event)" ondrop="handleDrop(event,'img2imgFile')" ondragleave="this.classList.remove('dragover')">
+            <input type="file" id="img2imgFile" accept="image/*" onchange="previewUpload(this, 'img2imgPreview')">
+            <div class="drop-icon">📤</div>
+            <div class="drop-text">Drop image here or click to upload</div>
+            <img id="img2imgPreview" class="preview-img" style="display:none">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Transformation Prompt</label>
+          <textarea id="img2imgPrompt" rows="3" placeholder="Transform into oil painting style, warm colors, impressionist brushwork..." oninput="countChars(this,'i2iCharCount')"></textarea>
+          <div class="char-counter"><span id="i2iCharCount">0</span> / 500</div>
+          <div class="presets">
+            <span class="preset-chip" onclick="setPrompt('img2imgPrompt', 'Convert to oil painting, impressionist style, thick brushstrokes, warm palette')">🎨 Oil painting</span>
+            <span class="preset-chip" onclick="setPrompt('img2imgPrompt', 'Anime style illustration, vibrant colors, cel shaded, Studio Ghibli inspired')">🎌 Anime style</span>
+            <span class="preset-chip" onclick="setPrompt('img2imgPrompt', 'Watercolor painting, soft edges, pastel colors, delicate brush marks')">💧 Watercolor</span>
+            <span class="preset-chip" onclick="setPrompt('img2imgPrompt', 'Cyberpunk version, neon lights, dark atmosphere, futuristic elements')">🤖 Cyberpunk</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Strength (how much to change) — <span id="i2iStrengthVal">0.75</span></label>
+          <input type="range" id="i2iStrength" min="0.1" max="1" step="0.05" value="0.75" oninput="document.getElementById('i2iStrengthVal').textContent=this.value">
+        </div>
+
+        <div class="form-grid">
+          <div>
+            <label>Steps</label>
+            <div class="range-wrap">
+              <input type="range" id="i2iSteps" min="10" max="50" value="20" oninput="document.getElementById('i2iStepsVal').textContent=this.value">
+              <span class="range-val" id="i2iStepsVal">20</span>
+            </div>
+          </div>
+          <div>
+            <label>Guidance</label>
+            <div class="range-wrap">
+              <input type="range" id="i2iGuidance" min="1" max="20" step="0.5" value="7.5" oninput="document.getElementById('i2iGuidanceVal').textContent=this.value">
+              <span class="range-val" id="i2iGuidanceVal">7.5</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-full" id="img2imgGenBtn" onclick="generateImg2Img()">
+          ✦ Transform Image
+        </button>
+      </div>
+
+      <div class="status-log" id="img2imgLog" style="margin-top:1rem">
+        <div class="log-entry log-info"><span class="log-time">[ASTRA]</span><span class="log-msg">Upload an image and enter a transformation prompt.</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card-label">Output</div>
+      <div class="output-area" id="img2imgOutput">
+        <div class="output-placeholder">
+          <div class="output-icon">🎨</div>
+          <div>Transformed image will appear here</div>
+        </div>
+      </div>
+      <div class="download-bar" id="img2imgDownloadBar" style="display:none">
+        <button class="btn btn-secondary btn-sm" onclick="downloadOutput('img2imgOutputEl', 'transformed.png')">⬇ Download PNG</button>
+        <button class="btn btn-secondary btn-sm" onclick="saveToGallery('img2img')">📁 Save to Gallery</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== TAB: TTS ======== -->
+<div id="tab-tts" class="tab-panel">
+  <div class="section-header">
+    <div class="section-title">Text → <span>Speech</span></div>
+    <div class="section-desc">// multilingual text-to-speech · natural voices · multiple languages</div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="card">
+        <div class="card-label">Language & Voice</div>
+
+        <div class="voice-grid" id="voiceGrid">
+          <div class="voice-card active" data-model="facebook/mms-tts-eng" onclick="selectVoice(this)">
+            <div class="voice-icon">🇺🇸</div>
+            <div class="voice-name">English</div>
+            <div class="voice-lang">MMS-TTS</div>
+          </div>
+          <div class="voice-card" data-model="facebook/mms-tts-fra" onclick="selectVoice(this)">
+            <div class="voice-icon">🇫🇷</div>
+            <div class="voice-name">French</div>
+            <div class="voice-lang">MMS-TTS</div>
+          </div>
+          <div class="voice-card" data-model="facebook/mms-tts-spa" onclick="selectVoice(this)">
+            <div class="voice-icon">🇪🇸</div>
+            <div class="voice-name">Spanish</div>
+            <div class="voice-lang">MMS-TTS</div>
+          </div>
+          <div class="voice-card" data-model="facebook/mms-tts-deu" onclick="selectVoice(this)">
+            <div class="voice-icon">🇩🇪</div>
+            <div class="voice-name">German</div>
+            <div class="voice-lang">MMS-TTS</div>
+          </div>
+          <div class="voice-card" data-model="facebook/mms-tts-hin" onclick="selectVoice(this)">
+            <div class="voice-icon">🇮🇳</div>
+            <div class="voice-name">Hindi</div>
+            <div class="voice-lang">MMS-TTS</div>
+          </div>
+          <div class="voice-card" data-model="facebook/mms-tts-arb" onclick="selectVoice(this)">
+            <div class="voice-icon">🇸🇦</div>
+            <div class="voice-name">Arabic</div>
+            <div class="voice-lang">MMS-TTS</div>
+          </div>
+          <div class="voice-card" data-model="facebook/mms-tts-por" onclick="selectVoice(this)">
+            <div class="voice-icon">🇧🇷</div>
+            <div class="voice-name">Portuguese</div>
+            <div class="voice-lang">MMS-TTS</div>
+          </div>
+          <div class="voice-card" data-model="facebook/mms-tts-rus" onclick="selectVoice(this)">
+            <div class="voice-icon">🇷🇺</div>
+            <div class="voice-name">Russian</div>
+            <div class="voice-lang">MMS-TTS</div>
+          </div>
+          <div class="voice-card" data-model="facebook/mms-tts-zho" onclick="selectVoice(this)">
+            <div class="voice-icon">🇨🇳</div>
+            <div class="voice-name">Chinese</div>
+            <div class="voice-lang">MMS-TTS</div>
+          </div>
+          <div class="voice-card" data-model="facebook/mms-tts-jpn" onclick="selectVoice(this)">
+            <div class="voice-icon">🇯🇵</div>
+            <div class="voice-name">Japanese</div>
+            <div class="voice-lang">MMS-TTS</div>
+          </div>
+          <div class="voice-card" data-model="facebook/mms-tts-kor" onclick="selectVoice(this)">
+            <div class="voice-icon">🇰🇷</div>
+            <div class="voice-name">Korean</div>
+            <div class="voice-lang">MMS-TTS</div>
+          </div>
+          <div class="voice-card" data-model="facebook/mms-tts-ita" onclick="selectVoice(this)">
+            <div class="voice-icon">🇮🇹</div>
+            <div class="voice-name">Italian</div>
+            <div class="voice-lang">MMS-TTS</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Text to Speak</label>
+          <textarea id="ttsText" rows="5" placeholder="Enter the text you want to convert to speech. You can write multiple sentences. The AI will generate natural-sounding audio in the selected language..." oninput="countChars(this,'ttsCharCount')"></textarea>
+          <div class="char-counter"><span id="ttsCharCount">0</span> / 1000</div>
+        </div>
+
+        <div class="form-row">
+          <div class="presets">
+            <span class="preset-chip" onclick="setPrompt('ttsText', 'Welcome to ASTRA Studio, the free AI generation platform powered by Hugging Face.')">👋 Welcome msg</span>
+            <span class="preset-chip" onclick="setPrompt('ttsText', 'The quick brown fox jumps over the lazy dog. This is a voice quality test.')">🦊 Voice test</span>
+            <span class="preset-chip" onclick="setPrompt('ttsText', 'Artificial intelligence is transforming the world. New models are released every day.')">🤖 AI news</span>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-full" id="ttsGenBtn" onclick="generateTTS()">
+          ✦ Generate Speech
+        </button>
+      </div>
+
+      <div class="status-log" id="ttsLog" style="margin-top:1rem">
+        <div class="log-entry log-info"><span class="log-time">[ASTRA]</span><span class="log-msg">Select a language, enter text, and generate.</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card-label">Output</div>
+      <div class="output-area" id="ttsOutput" style="min-height:200px">
+        <div class="output-placeholder">
+          <div class="output-icon">🎙️</div>
+          <div>Audio will appear here</div>
+        </div>
+      </div>
+      <div class="download-bar" id="ttsDownloadBar" style="display:none">
+        <button class="btn btn-secondary btn-sm" id="ttsDownloadBtn">⬇ Download Audio</button>
+        <button class="btn btn-secondary btn-sm" onclick="saveToGallery('tts')">📁 Save to Gallery</button>
+      </div>
+
+      <div class="card" style="margin-top:1rem">
+        <div class="card-label">TTS Tips</div>
+        <div class="tip" style="color:var(--text);line-height:2">
+          • Facebook MMS supports <strong>1100+ languages</strong><br>
+          • Keep text under 500 chars for best results<br>
+          • Add punctuation for natural pauses<br>
+          • For longer text, split into multiple requests<br>
+          • Audio output is typically WAV format
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== TAB: GALLERY ======== -->
+<div id="tab-gallery" class="tab-panel">
+  <div class="section-header">
+    <div class="section-title">My <span>Gallery</span></div>
+    <div class="section-desc">// your generated media · stored locally in browser</div>
+  </div>
+
+  <div class="info-box">
+    ℹ Gallery stores items in your browser's memory during this session. To permanently save, download files using the ⬇ button on each item.
+  </div>
+
+  <div style="display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap">
+    <button class="btn btn-secondary btn-sm" onclick="filterGallery('all')" id="gf-all" style="border-color:var(--accent)">All</button>
+    <button class="btn btn-secondary btn-sm" onclick="filterGallery('image')" id="gf-image">Images</button>
+    <button class="btn btn-secondary btn-sm" onclick="filterGallery('video')" id="gf-video">Videos</button>
+    <button class="btn btn-secondary btn-sm" onclick="filterGallery('tts')" id="gf-tts">Audio</button>
+    <button class="btn btn-secondary btn-sm" onclick="clearGallery()" style="margin-left:auto;color:var(--danger);border-color:var(--danger)">🗑 Clear All</button>
+  </div>
+
+  <div class="gallery" id="galleryGrid">
+    <div style="text-align:center;color:var(--muted);font-family:'Space Mono',monospace;font-size:0.8rem;padding:3rem;grid-column:1/-1">
+      <div style="font-size:2rem;margin-bottom:8px">📁</div>
+      Nothing saved yet. Generate some content and click "Save to Gallery".
+    </div>
+  </div>
+</div>
+
+<!-- ======== TAB: DEPLOY GUIDE ======== -->
+<div id="tab-guide" class="tab-panel">
+  <div class="section-header">
+    <div class="section-title">Deploy <span>Free</span></div>
+    <div class="section-desc">// host this platform for free · step-by-step guide</div>
+  </div>
+
+  <div class="info-box">
+    ✅ This entire platform is a single HTML file. No server needed. No backend. No database. Host it anywhere static files are supported — all 100% free.
+  </div>
+
+  <div class="guide-grid">
+    <div class="guide-card">
+      <div class="guide-step">1</div>
+      <div class="guide-title">Get the File</div>
+      <div class="guide-body">
+        Download <code>index.html</code> from this page. This is your entire app — one file, no dependencies, no build step needed.
+        <br><br>
+        Alternatively, create a new file locally and paste all the code into it.
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="guide-step">2</div>
+      <div class="guide-title">Create GitHub Repo</div>
+      <div class="guide-body">
+        1. Go to <a href="https://github.com" target="_blank">github.com</a> → Sign up free<br>
+        2. Click "New repository" → name it <code>astra-studio</code><br>
+        3. Set to <strong>Public</strong><br>
+        4. Upload your <code>index.html</code> file<br>
+        5. Commit changes
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="guide-step">3A</div>
+      <div class="guide-title">Deploy via GitHub Pages</div>
+      <div class="guide-body">
+        In your repo: <strong>Settings → Pages</strong><br>
+        Source: <code>Deploy from branch</code><br>
+        Branch: <code>main</code> → <code>/ (root)</code><br>
+        Click Save.<br><br>
+        URL: <code>username.github.io/astra-studio</code><br>
+        ✅ Free forever. Custom domain supported.
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="guide-step">3B</div>
+      <div class="guide-title">Deploy via Vercel</div>
+      <div class="guide-body">
+        1. Go to <a href="https://vercel.com" target="_blank">vercel.com</a> → Sign up with GitHub<br>
+        2. "Import Project" → select your repo<br>
+        3. Click Deploy (no config needed)<br><br>
+        URL: <code>astra-studio.vercel.app</code><br>
+        ✅ Free tier: 100GB bandwidth/month. SSL included. Auto-deploy on git push.
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="guide-step">3C</div>
+      <div class="guide-title">Deploy via Netlify</div>
+      <div class="guide-body">
+        1. Go to <a href="https://netlify.com" target="_blank">netlify.com</a> → Sign up free<br>
+        2. Drag & drop your <code>index.html</code> into the deploy area<br>
+        3. Done in 10 seconds.<br><br>
+        URL: <code>random-name.netlify.app</code><br>
+        ✅ Free tier: 100GB/month. Instant deploy. No git needed.
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="guide-step">4</div>
+      <div class="guide-title">Get HF Token (Optional)</div>
+      <div class="guide-body">
+        Free HF tokens give higher rate limits:<br>
+        1. Go to <a href="https://huggingface.co" target="_blank">huggingface.co</a> → Create account<br>
+        2. Settings → Access Tokens → New token<br>
+        3. Role: <code>Read</code> is enough<br>
+        4. Paste into the token bar at the top<br><br>
+        ⚠ Never commit your token to GitHub.
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="guide-step">5</div>
+      <div class="guide-title">Custom Domain</div>
+      <div class="guide-body">
+        Want <code>yourdomain.com</code>?<br><br>
+        <strong>Free options:</strong><br>
+        • <a href="https://www.freenom.com" target="_blank">Freenom</a> — free .tk/.ml domains<br>
+        • <a href="https://js.org" target="_blank">js.org</a> — free subdomain for devs<br>
+        • Cloudflare Pages — free hosting + free SSL<br><br>
+        Connect your domain to Vercel/Netlify/GitHub Pages in their DNS settings.
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="guide-step">6</div>
+      <div class="guide-title">Troubleshooting</div>
+      <div class="guide-body">
+        <strong>Model loading (503):</strong> HF server busy. Wait 30s and retry.<br><br>
+        <strong>CORS errors:</strong> Some models have CORS restrictions. Try a different model.<br><br>
+        <strong>Slow generation:</strong> Free tier is shared. Expect 30s–5min for video. Images: 5–30s.<br><br>
+        <strong>No output:</strong> Check browser console (F12) for API errors.
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="guide-step">7</div>
+      <div class="guide-title">Limits & Tips</div>
+      <div class="guide-body">
+        • HF free tier: ~30 requests/hour without token<br>
+        • With token: higher limits, priority queue<br>
+        • Video models are slowest (GPU-heavy)<br>
+        • FLUX Schnell is fastest for images<br>
+        • MMS-TTS works instantly (CPU model)<br>
+        • Results are not stored by HF — download to save
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:2rem" class="card">
+    <div class="card-label">Stack Overview</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-top:0.5rem">
+      <div>
+        <div style="font-weight:700;margin-bottom:4px">Frontend</div>
+        <div class="tip" style="color:var(--text)">Pure HTML + CSS + Vanilla JS<br>Zero dependencies<br>Single file deployment</div>
+      </div>
+      <div>
+        <div style="font-weight:700;margin-bottom:4px">AI Backend</div>
+        <div class="tip" style="color:var(--text)">Hugging Face Inference API<br>Free tier available<br>No server required</div>
+      </div>
+      <div>
+        <div style="font-weight:700;margin-bottom:4px">Hosting</div>
+        <div class="tip" style="color:var(--text)">GitHub Pages / Vercel / Netlify<br>Free SSL + CDN<br>Custom domains supported</div>
+      </div>
+      <div>
+        <div style="font-weight:700;margin-bottom:4px">Cost</div>
+        <div class="tip" style="color:var(--success)">$0/month<br>Completely free<br>No credit card needed</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+const state = {
+  selectedModels: {
+    video: 'Wan-AI/Wan2.1-T2V-14B',
+    image: 'black-forest-labs/FLUX.1-schnell',
+    img2img: 'stabilityai/stable-diffusion-xl-refiner-1.0'
+  },
+  selectedVoice: 'facebook/mms-tts-eng',
+  gallery: [],
+  outputs: {}
+};
+
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ============================================================
+// TOKEN
+// ============================================================
+function updateTokenStatus() {
+  const val = document.getElementById('hfToken').value.trim();
+  const el = document.getElementById('tokenStatus');
+  if (val.startsWith('hf_') && val.length > 10) {
+    el.textContent = 'CONNECTED';
+    el.className = 'token-status connected';
+  } else if (val.length === 0) {
+    el.textContent = 'NO TOKEN';
+    el.className = 'token-status disconnected';
+  } else {
+    el.textContent = 'INVALID';
+    el.className = 'token-status disconnected';
+  }
+}
+
+function getToken() {
+  return document.getElementById('hfToken').value.trim() || null;
+}
+
+function getHeaders() {
+  const token = getToken();
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return headers;
+}
+
+// ============================================================
+// MODEL / VOICE SELECTION
+// ============================================================
+function selectModel(type, btn) {
+  const container = document.getElementById(type === 'img2img' ? 'img2imgModels' : type + 'Models');
+  container.querySelectorAll('.model-tag').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  state.selectedModels[type] = btn.dataset.model;
+}
+
+function selectVoice(card) {
+  document.querySelectorAll('.voice-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  state.selectedVoice = card.dataset.model;
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function setPrompt(id, text) {
+  const el = document.getElementById(id);
+  el.value = text;
+  el.dispatchEvent(new Event('input'));
+}
+
+function countChars(el, counterId) {
+  document.getElementById(counterId).textContent = el.value.length;
+}
+
+function addLog(logId, msg, type = 'info') {
+  const log = document.getElementById(logId);
+  const time = new Date().toLocaleTimeString('en', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const entry = document.createElement('div');
+  entry.className = `log-entry log-${type}`;
+  entry.innerHTML = `<span class="log-time">[${time}]</span><span class="log-msg">${msg}</span>`;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+}
+
+function setLoading(outputId, btnId, queueId) {
+  const output = document.getElementById(outputId);
+  output.innerHTML = `
+    <div class="progress-wrap">
+      <div class="spinner"></div>
+      <div class="progress-bar-outer" style="margin-top:16px"><div class="progress-bar-inner"></div></div>
+      <div class="progress-text" id="${outputId}_text">Connecting to Hugging Face…</div>
+    </div>`;
+  if (btnId) document.getElementById(btnId).disabled = true;
+  if (queueId) document.getElementById(queueId).style.display = 'flex';
+}
+
+function clearLoading(btnId, queueId) {
+  if (btnId) document.getElementById(btnId).disabled = false;
+  if (queueId) document.getElementById(queueId).style.display = 'none';
+}
+
+function updateProgress(outputId, msg) {
+  const el = document.getElementById(outputId + '_text');
+  if (el) el.textContent = msg;
+}
+
+async function callHFWithRetry(model, payload, type, maxRetries = 3) {
+  const url = `https://api-inference.huggingface.co/models/${model}`;
+  for (let i = 0; i < maxRetries; i++) {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(payload)
+    });
+
+    if (response.status === 503) {
+      const json = await response.json().catch(() => ({}));
+      const wait = (json.estimated_time || 20) * 1000;
+      throw new Error(`MODEL_LOADING:${Math.ceil(wait/1000)}`);
+    }
+
+    if (response.status === 429) {
+      if (i < maxRetries - 1) {
+        await new Promise(r => setTimeout(r, 5000 * (i + 1)));
+        continue;
+      }
+      throw new Error('Rate limited. Add an HF token for higher limits.');
+    }
+
+    if (!response.ok) {
+      const txt = await response.text().catch(() => response.statusText);
+      throw new Error(`API Error ${response.status}: ${txt.substring(0, 200)}`);
+    }
+
+    return response;
+  }
+}
+
+// ============================================================
+// TEXT TO VIDEO
+// ============================================================
+async function generateVideo() {
+  const prompt = document.getElementById('videoPrompt').value.trim();
+  if (!prompt) { alert('Please enter a prompt.'); return; }
+
+  const model = state.selectedModels.video;
+  const steps = parseInt(document.getElementById('videoSteps').value);
+  const guidance = parseFloat(document.getElementById('videoGuidance').value);
+  const negPrompt = document.getElementById('videoNegPrompt').value.trim();
+
+  setLoading('videoOutput', 'videoGenBtn', 'videoQueue');
+  addLog('videoLog', `Starting video generation with ${model.split('/')[1]}…`, 'info');
+  addLog('videoLog', `Prompt: "${prompt.substring(0, 80)}…"`, 'info');
+
+  document.getElementById('videoQueueText').textContent = 'Queued — video generation can take 1–5 min on free tier…';
+
+  try {
+    const payload = {
+      inputs: prompt,
+      parameters: {
+        num_inference_steps: steps,
+        guidance_scale: guidance,
+        ...(negPrompt && { negative_prompt: negPrompt })
+      }
+    };
+
+    updateProgress('videoOutput', 'Sending request to Hugging Face…');
+    addLog('videoLog', 'Sending request to HF Inference API…', 'info');
+
+    const response = await callHFWithRetry(model, payload, 'video');
+
+    updateProgress('videoOutput', 'Processing video data…');
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+
+    const output = document.getElementById('videoOutput');
+    output.innerHTML = '';
+    const video = document.createElement('video');
+    video.id = 'videoOutputEl';
+    video.src = url;
+    video.controls = true;
+    video.autoplay = true;
+    video.loop = true;
+    video.style.width = '100%';
+    output.appendChild(video);
+
+    state.outputs.video = { url, blob, type: 'video' };
+    document.getElementById('videoDownloadBar').style.display = 'flex';
+    addLog('videoLog', '✅ Video generated successfully!', 'success');
+
+  } catch (e) {
+    clearLoading('videoGenBtn', 'videoQueue');
+    const output = document.getElementById('videoOutput');
+
+    if (e.message.startsWith('MODEL_LOADING:')) {
+      const secs = e.message.split(':')[1];
+      output.innerHTML = `<div class="output-placeholder"><div class="output-icon">⏳</div><div>Model is loading on HF servers</div><div style="font-size:0.72rem;margin-top:4px">Estimated wait: ~${secs}s. Click Generate again after waiting.</div></div>`;
+      addLog('videoLog', `Model loading on server. Est. wait: ${secs}s. Try again shortly.`, 'error');
+    } else {
+      output.innerHTML = `<div class="output-placeholder"><div class="output-icon">❌</div><div>${e.message}</div></div>`;
+      addLog('videoLog', `Error: ${e.message}`, 'error');
+    }
+    return;
+  }
+
+  clearLoading('videoGenBtn', 'videoQueue');
+}
+
+// ============================================================
+// TEXT TO IMAGE
+// ============================================================
+async function generateImage() {
+  const prompt = document.getElementById('imagePrompt').value.trim();
+  if (!prompt) { alert('Please enter a prompt.'); return; }
+
+  const model = state.selectedModels.image;
+  const negPrompt = document.getElementById('imageNegPrompt').value.trim();
+  const steps = parseInt(document.getElementById('imageSteps').value);
+  const guidance = parseFloat(document.getElementById('imageGuidance').value);
+  const width = parseInt(document.getElementById('imageWidth').value);
+  const height = parseInt(document.getElementById('imageHeight').value);
+  const seed = parseInt(document.getElementById('imageSeed').value);
+
+  setLoading('imageOutput', 'imageGenBtn', null);
+  addLog('imageLog', `Generating with ${model.split('/')[1]}…`, 'info');
+
+  try {
+    const payload = {
+      inputs: prompt,
+      parameters: {
+        num_inference_steps: steps,
+        guidance_scale: guidance,
+        width, height,
+        ...(negPrompt && { negative_prompt: negPrompt }),
+        ...(seed !== -1 && { seed })
+      }
+    };
+
+    updateProgress('imageOutput', 'Generating image…');
+    const response = await callHFWithRetry(model, payload, 'image');
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+
+    const output = document.getElementById('imageOutput');
+    output.innerHTML = '';
+    const img = document.createElement('img');
+    img.id = 'imageOutputEl';
+    img.src = url;
+    img.style.width = '100%';
+    output.appendChild(img);
+
+    state.outputs.image = { url, blob, type: 'image' };
+    document.getElementById('imageDownloadBar').style.display = 'flex';
+    addLog('imageLog', '✅ Image generated!', 'success');
+
+  } catch (e) {
+    const output = document.getElementById('imageOutput');
+    if (e.message.startsWith('MODEL_LOADING:')) {
+      const secs = e.message.split(':')[1];
+      output.innerHTML = `<div class="output-placeholder"><div class="output-icon">⏳</div><div>Model loading (~${secs}s). Try again shortly.</div></div>`;
+      addLog('imageLog', `Model loading. Wait ~${secs}s.`, 'error');
+    } else {
+      output.innerHTML = `<div class="output-placeholder"><div class="output-icon">❌</div><div>${e.message}</div></div>`;
+      addLog('imageLog', `Error: ${e.message}`, 'error');
+    }
+  }
+
+  clearLoading('imageGenBtn', null);
+}
+
+// ============================================================
+// IMAGE TO IMAGE
+// ============================================================
+async function generateImg2Img() {
+  const fileInput = document.getElementById('img2imgFile');
+  const prompt = document.getElementById('img2imgPrompt').value.trim();
+
+  if (!fileInput.files[0]) { alert('Please upload an image first.'); return; }
+  if (!prompt) { alert('Please enter a transformation prompt.'); return; }
+
+  const model = state.selectedModels.img2img;
+  const strength = parseFloat(document.getElementById('i2iStrength').value);
+  const steps = parseInt(document.getElementById('i2iSteps').value);
+  const guidance = parseFloat(document.getElementById('i2iGuidance').value);
+
+  setLoading('img2imgOutput', 'img2imgGenBtn', null);
+  addLog('img2imgLog', `Transforming image with ${model.split('/')[1]}…`, 'info');
+
+  try {
+    // Convert image to base64
+    const file = fileInput.files[0];
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    const payload = {
+      inputs: base64,
+      parameters: {
+        prompt,
+        strength,
+        num_inference_steps: steps,
+        guidance_scale: guidance
+      }
+    };
+
+    updateProgress('img2imgOutput', 'Transforming image…');
+    const response = await callHFWithRetry(model, payload, 'image');
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+
+    const output = document.getElementById('img2imgOutput');
+    output.innerHTML = '';
+    const img = document.createElement('img');
+    img.id = 'img2imgOutputEl';
+    img.src = url;
+    img.style.width = '100%';
+    output.appendChild(img);
+
+    state.outputs.img2img = { url, blob, type: 'image' };
+    document.getElementById('img2imgDownloadBar').style.display = 'flex';
+    addLog('img2imgLog', '✅ Transformation complete!', 'success');
+
+  } catch (e) {
+    const output = document.getElementById('img2imgOutput');
+    if (e.message.startsWith('MODEL_LOADING:')) {
+      const secs = e.message.split(':')[1];
+      output.innerHTML = `<div class="output-placeholder"><div class="output-icon">⏳</div><div>Model loading (~${secs}s). Retry shortly.</div></div>`;
+    } else {
+      output.innerHTML = `<div class="output-placeholder"><div class="output-icon">❌</div><div>${e.message}</div></div>`;
+    }
+    addLog('img2imgLog', `Error: ${e.message}`, 'error');
+  }
+
+  clearLoading('img2imgGenBtn', null);
+}
+
+// ============================================================
+// TTS
+// ============================================================
+async function generateTTS() {
+  const text = document.getElementById('ttsText').value.trim();
+  if (!text) { alert('Please enter some text.'); return; }
+
+  const model = state.selectedVoice;
+
+  setLoading('ttsOutput', 'ttsGenBtn', null);
+  addLog('ttsLog', `Generating speech with ${model}…`, 'info');
+
+  try {
+    const response = await callHFWithRetry(model, { inputs: text }, 'audio');
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+
+    const output = document.getElementById('ttsOutput');
+    output.innerHTML = '';
+    const audio = document.createElement('audio');
+    audio.id = 'ttsOutputEl';
+    audio.src = url;
+    audio.controls = true;
+    audio.style.cssText = 'width:100%;margin:1rem;filter:invert(0.9)';
+    output.appendChild(audio);
+
+    state.outputs.tts = { url, blob, type: 'audio' };
+
+    const dlBtn = document.getElementById('ttsDownloadBtn');
+    dlBtn.onclick = () => downloadBlob(blob, 'speech.wav');
+    document.getElementById('ttsDownloadBar').style.display = 'flex';
+
+    addLog('ttsLog', '✅ Speech generated!', 'success');
+
+  } catch (e) {
+    const output = document.getElementById('ttsOutput');
+    if (e.message.startsWith('MODEL_LOADING:')) {
+      const secs = e.message.split(':')[1];
+      output.innerHTML = `<div class="output-placeholder"><div class="output-icon">⏳</div><div>Model loading (~${secs}s). Retry shortly.</div></div>`;
+    } else {
+      output.innerHTML = `<div class="output-placeholder"><div class="output-icon">❌</div><div>${e.message}</div></div>`;
+    }
+    addLog('ttsLog', `Error: ${e.message}`, 'error');
+  }
+
+  clearLoading('ttsGenBtn', null);
+}
+
+// ============================================================
+// DOWNLOAD
+// ============================================================
+function downloadOutput(elId, filename) {
+  const data = state.outputs[elId === 'videoOutputEl' ? 'video' : elId === 'imageOutputEl' ? 'image' : 'img2img'];
+  if (data) downloadBlob(data.blob, filename);
+}
+
+function downloadBlob(blob, filename) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+// ============================================================
+// GALLERY
+// ============================================================
+function saveToGallery(type) {
+  const data = state.outputs[type];
+  if (!data) return;
+
+  const id = Date.now();
+  const item = { id, ...data, timestamp: new Date().toLocaleString() };
+  state.gallery.push(item);
+  renderGallery();
+  addLog(type === 'video' ? 'videoLog' : type === 'image' ? 'imageLog' : type === 'img2img' ? 'img2imgLog' : 'ttsLog', '✅ Saved to gallery', 'success');
+}
+
+function renderGallery(filter = 'all') {
+  const grid = document.getElementById('galleryGrid');
+  const items = filter === 'all' ? state.gallery : state.gallery.filter(i => {
+    if (filter === 'image') return i.type === 'image';
+    if (filter === 'video') return i.type === 'video';
+    if (filter === 'tts') return i.type === 'audio';
+    return true;
+  });
+
+  if (items.length === 0) {
+    grid.innerHTML = `<div style="text-align:center;color:var(--muted);font-family:'Space Mono',monospace;font-size:0.8rem;padding:3rem;grid-column:1/-1"><div style="font-size:2rem;margin-bottom:8px">📁</div>No items${filter !== 'all' ? ' in this category' : ''} yet.</div>`;
+    return;
+  }
+
+  grid.innerHTML = '';
+  items.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'gallery-item';
+
+    if (item.type === 'image') {
+      div.innerHTML = `
+        <img src="${item.url}" alt="Generated image">
+        <div class="item-overlay">
+          <button class="btn btn-secondary btn-sm" onclick="downloadBlob(state.gallery.find(i=>i.id===${item.id}).blob,'image.png')">⬇</button>
+          <button class="btn btn-secondary btn-sm" onclick="removeFromGallery(${item.id})">🗑</button>
+        </div>`;
+    } else if (item.type === 'video') {
+      div.innerHTML = `
+        <video src="${item.url}" style="width:100%;height:100%;object-fit:cover" muted loop></video>
+        <div class="item-overlay">
+          <button class="btn btn-secondary btn-sm" onclick="downloadBlob(state.gallery.find(i=>i.id===${item.id}).blob,'video.mp4')">⬇</button>
+          <button class="btn btn-secondary btn-sm" onclick="removeFromGallery(${item.id})">🗑</button>
+        </div>`;
+      div.querySelector('video').play().catch(()=>{});
+    } else if (item.type === 'audio') {
+      div.style.aspectRatio = 'auto';
+      div.style.flexDirection = 'column';
+      div.style.padding = '1rem';
+      div.innerHTML = `
+        <div style="font-size:2rem;margin-bottom:8px">🎙️</div>
+        <div style="font-size:0.72rem;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:8px">${item.timestamp}</div>
+        <audio src="${item.url}" controls style="width:100%;filter:invert(0.9)"></audio>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button class="btn btn-secondary btn-sm" onclick="downloadBlob(state.gallery.find(i=>i.id===${item.id}).blob,'speech.wav')">⬇</button>
+          <button class="btn btn-secondary btn-sm" onclick="removeFromGallery(${item.id})">🗑</button>
+        </div>`;
+    }
+
+    grid.appendChild(div);
+  });
+}
+
+let galleryFilter = 'all';
+function filterGallery(type) {
+  galleryFilter = type;
+  ['all','image','video','tts'].forEach(t => {
+    document.getElementById('gf-'+t).style.borderColor = t === type ? 'var(--accent)' : 'var(--border)';
+  });
+  renderGallery(type);
+}
+
+function removeFromGallery(id) {
+  state.gallery = state.gallery.filter(i => i.id !== id);
+  renderGallery(galleryFilter);
+}
+
+function clearGallery() {
+  if (!confirm('Clear all gallery items?')) return;
+  state.gallery = [];
+  renderGallery();
+}
+
+// ============================================================
+// FILE UPLOAD
+// ============================================================
+function previewUpload(input, previewId) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById(previewId);
+    img.src = e.target.result;
+    img.style.display = 'block';
+    input.parentElement.querySelector('.drop-icon').style.display = 'none';
+    input.parentElement.querySelector('.drop-text').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.currentTarget.classList.add('dragover');
+}
+
+function handleDrop(e, inputId) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    const input = document.getElementById(inputId);
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    input.files = dt.files;
+    previewUpload(input, 'img2imgPreview');
+  }
+}
+</script>
+</body>
+</html>
